@@ -40,13 +40,16 @@ WebCodecs를 사용할 수 있으면 브라우저 기본 인코더를 먼저 사
 
 음질 유지하기는 기본 ON입니다. AAC는 원본 패킷을 복사하고 음성 용량을 영상 예산보다 먼저 확보합니다. AAC 비트레이트가 없으면 원본 패킷 또는 무손실 remux로 확인합니다. 다른 음성 코덱은 원본 채널·샘플레이트를 유지한 고음질 AAC로 변환합니다(모노 128kbps, 스테레오 256kbps, 최대 512kbps). MP3/Opus/Vorbis 원본이 더 높은 비트레이트면 512kbps까지 반영합니다. 다른 코덱의 변환은 무손실을 보장하지 않습니다. OFF는 64kbps AAC, 음성 유지 OFF는 트랙 제거입니다. 목표가 음성 예산보다 작으면 음질을 낮추지 않고 오류를 표시합니다.
 
-## GitHub 블로그 배포
+## 독립 저장소와 배포
 
+저장소: https://github.com/NAS306/videocompressor
 공개 주소: https://nas306.github.io/videocompressor/
 
-NAS306/NAS306.github.io main 루트의 기존 Pages 배포를 사용합니다. 공개 자산은 videocompressor/, 소스는 Jekyll이 제외하는 _apps/videocompressor/에 둡니다. 코어는 npm 설치 후 생성하므로 public/ffmpeg/와 public/ffmpeg-mt/는 숨겨진 소스에 복사하지 않습니다. 기존 블로그 루트를 유지하기 위해 앱 전용 deploy.yml을 블로그 워크플로로 복사하지 않습니다.
+압축기 소스는 이 저장소 루트에서 관리합니다. 이전 NAS306.github.io 저장소의 압축기 소스 변경 이력을 분리해 보존했습니다. tank game 저장소와 압축기 저장소는 독립적입니다.
 
-로컬 검증 후 deployment/redeploy.mjs로 기존 파일을 백업하고 dist/와 소스를 동기화합니다. 이전 해시 자산은 백업 후 제거합니다. 변경은 두 앱 경로만 커밋·push하고 기존 Pages build and deployment 성공과 공개 주소 압축을 확인합니다.
+main에 push하면 .github/workflows/deploy.yml이 npm ci → npm test → npm run build → GitHub Pages 게시를 수행합니다. 저장소 Settings → Pages의 배포 원본은 GitHub Actions입니다. dist/와 public/ffmpeg/, public/ffmpeg-mt/는 빌드 시 생성되므로 커밋하지 않습니다.
+
+수정 후 npm test와 npm run build, 필요 시 실제 브라우저 검증을 실행하고 소스를 main에 커밋·push합니다. Actions 성공 후 공개 주소에서 압축을 확인합니다. 기존 로컬 작업 폴더는 deployment/redeploy.mjs로 deployment/standalone 저장소에 소스를 백업·동기화할 수 있습니다. 이 절차는 tank game 저장소를 수정하지 않습니다.
 
 서비스 워커는 /videocompressor/ 범위 응답에 COOP/COEP/CORP 헤더를 적용합니다. 최초 제어 후 파일 선택·작업이 없는 경우 한 번 새로고침해 SharedArrayBuffer를 활성화합니다. 별도 서버나 브라우저 보안 설정 변경은 필요하지 않습니다. 블로그의 다른 경로에는 적용하지 않습니다.
 
